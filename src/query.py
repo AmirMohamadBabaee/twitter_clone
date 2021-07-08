@@ -199,6 +199,16 @@ init_RemoveBan_procedure_query = """CREATE PROCEDURE RemoveBan(user_banned_param
 BEGIN
 	DECLARE currentUser varchar(20);
     SET currentUser = CurrentUser();
+    
+    IF NOT EXISTS (
+		SELECT *
+        FROM ban
+        WHERE (user_banning, user_banned) = (currentUser, user_banned_param)
+    ) THEN
+		SIGNAL SQLSTATE '02000'
+			SET MESSAGE_TEXT = 'This user was not banned!', MYSQL_ERRNO = 9992;
+    END IF;
+    
 	DELETE FROM ban
 	WHERE (user_banning, user_banned) = (currentUser, user_banned_param);
 END"""
@@ -221,6 +231,14 @@ END"""
 # UserLoginHistory Procedure
 init_UserLoginHistory_procedure_query = """CREATE PROCEDURE UserLoginHistory (username_login varchar(20))
 BEGIN
+	IF NOT EXISTS (
+		SELECT username
+        FROM user
+		WHERE username = username_login
+    ) THEN
+		SIGNAL SQLSTATE '02000'
+			SET MESSAGE_TEXT = 'User not found! Please sign up first.', MYSQL_ERRNO = 9990;
+    END IF;
 	SELECT * 
 	FROM last_login
 	WHERE username = username_login
@@ -232,6 +250,29 @@ init_LikeTweet_procedure_query = """CREATE PROCEDURE LikeTweet(tweet_id_param in
 BEGIN
 	DECLARE currentUser varchar(20);
     SET currentUser = CurrentUser();
+
+	IF NOT EXISTS (
+		SELECT tweet_id
+        FROM tweet
+        WHERE tweet_id = tweet_id_param
+    ) THEN
+		SIGNAL SQLSTATE '02000'
+			SET MESSAGE_TEXT = 'Selected Tweet does not found.', MYSQL_ERRNO = 9991;
+    END IF;
+    
+    IF currentUser IN (
+		SELECT user_banned
+		FROM ban
+		WHERE user_banning = (
+			SELECT user_sender
+            FROM tweet
+            WHERE tweet_id = tweet_id_param
+		)
+    ) THEN
+		SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'Sorry! You was banned by sender of this tweet.', MYSQL_ERRNO = 9980;
+    END IF;
+	
 	INSERT INTO tweet_like(tweet_id, username)
 		SELECT tweet_id, currentUser
 		FROM tweet
