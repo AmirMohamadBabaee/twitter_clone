@@ -2,7 +2,28 @@ from mysql.connector import connect, Error
 from query import *
 import logging
 
-def init_db(connection, cursor):
+def config_logger():
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.DEBUG)
+    
+    console_handler = logging.StreamHandler()
+    file_handler = logging.FileHandler(f'{__name__}.log')
+
+    console_handler.setLevel(logging.INFO)
+    file_handler.setLevel(logging.WARNING)
+
+    console_format = logging.Formatter('[%(asctime)s] [%(levelname)s] [%(name)s] : %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+    file_fomrat = logging.Formatter('[%(asctime)s] [%(levelname)s] [%(name)s] : %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+
+    console_handler.setFormatter(console_format)
+    file_handler.setFormatter(file_fomrat)
+
+    logger.addHandler(console_handler)
+    logger.addHandler(file_handler)
+
+    return logger
+
+def init_db(connection, cursor, logger):
     try:
         # create tables
         cursor.execute(init_user_table_query)
@@ -16,12 +37,12 @@ def init_db(connection, cursor):
         cursor.execute(init_tweet_like_table)
         cursor.execute(init_SignUpLog_table_query)
         cursor.execute(init_SendTweetLog_table_query)
-        print('tables created successfully.')
+        logger.info('[init_db] tables created successfully.')
 
         # create functions
         cursor.execute(trust_function_creator)
         cursor.execute(init_CurrentUser_function_query)
-        print('function created successfully.')
+        logger.info('[init_db] function created successfully.')
 
         # create procedures
         cursor.execute(init_SignUp_procedure_query)
@@ -47,29 +68,36 @@ def init_db(connection, cursor):
         cursor.execute(init_AddBan_procedure_query)
         cursor.execute(init_SendComment_procedure_query)
         cursor.execute(init_AddHashtagToTweet_Hashtag_procedure_query)
-        print('procedures created successfully.')
+        logger.info('[init_db] procedures created successfully.')
 
         # create trigger
         cursor.execute(init_SignUpLogger_trigger_query)
         cursor.execute(init_SendTweetLogger_trigger_query)
         cursor.execute(init_AddHashtagOfTweet_trigger_query)
-        print('triggers created successfully.')
+        logger.info('[init_db] triggers created successfully.')
 
         # commit changes
         connection.commit()
-        print('Database successfully initialized.')
+        logger.info('[init_db] Database successfully initialized.')
     except Error as e:
-        print('Error In Init_db:', e)
+        logger.exception('[init_db] An error occurred in init_db.')
 
-try:
-    with connect(
-        host="localhost",
-        user="twitter_admin",
-        password="admin_admin",
-        database="t"
-    ) as connection:
-        print(connection)
-        with connection.cursor() as cursor:
-            init_db(connection, cursor)
-except Error as e:
-    print('Error:', e)
+
+if __name__ == '__main__':
+
+    logger = config_logger()
+    logger.info('Twitter Started.')
+    try:
+        logger.info('Try to connect to database.')
+        with connect(
+            host="localhost",
+            user="twitter_admin",
+            password="admin_admin",
+            database="Twitter"
+        ) as connection:
+            logger.info('Program connected to database successfully.')
+            with connection.cursor() as cursor:
+                logger.info('initialize db.')
+                init_db(connection, cursor, logger)
+    except Error as e:
+        logger.exception('An error occurred in database initialization')
