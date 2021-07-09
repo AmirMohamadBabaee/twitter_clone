@@ -174,6 +174,40 @@ init_SendMessage_procedure_query = """CREATE PROCEDURE SendMessage(content varch
 BEGIN
 	DECLARE currentUser varchar(20);
     SET currentUser = CurrentUser();
+    
+    IF currentUser IN (
+		SELECT user_banned
+        FROM ban
+        WHERE user_banning = reciever
+    ) THEN
+		SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'Sorry! You were banned by receiver of this message.', MYSQL_ERRNO = 9981;
+    END IF;
+    
+    IF tweet_id_param IS NOT NULL THEN
+		IF tweet_id_param NOT IN (
+			SELECT tweet_id
+            FROM tweet
+        ) THEN 
+			SIGNAL SQLSTATE '02000'
+				SET MESSAGE_TEXT = 'Selected Tweet wasn`t found.', MYSQL_ERRNO = 9991;
+        END IF;
+        
+        IF currentUser IN (
+			SELECT user_banned
+            FROM ban
+            WHERE user_banning = (
+				SELECT user_sender
+                FROM tweet
+                WHERE tweet_id = tweet_id_param
+                LIMIT 1
+            )
+        ) THEN
+			SIGNAL SQLSTATE '45000'
+				SET MESSAGE_TEXT = 'Sorry! You were banned by sender of this tweet.', MYSQL_ERRNO = 9980;
+        END IF;
+    END IF;
+    
 	INSERT INTO message(body, date_sent, user_sender, user_reciever, tweet_id)
 		SELECT content, now(), currentUser, reciever, tweet_id_param
 		WHERE reciever NOT IN (
@@ -257,7 +291,7 @@ BEGIN
         WHERE tweet_id = tweet_id_param
     ) THEN
 		SIGNAL SQLSTATE '02000'
-			SET MESSAGE_TEXT = 'Selected Tweet does not found.', MYSQL_ERRNO = 9991;
+			SET MESSAGE_TEXT = 'Selected Tweet wasn`t found.', MYSQL_ERRNO = 9991;
     END IF;
     
     IF currentUser IN (
@@ -270,7 +304,7 @@ BEGIN
 		)
     ) THEN
 		SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Sorry! You was banned by sender of this tweet.', MYSQL_ERRNO = 9980;
+			SET MESSAGE_TEXT = 'Sorry! You were banned by sender of this tweet.', MYSQL_ERRNO = 9980;
     END IF;
 	
 	INSERT INTO tweet_like(tweet_id, username)
