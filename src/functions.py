@@ -39,7 +39,14 @@ def SendMessage(logger, cursor, content : str, receiver : str, tweet_id : int):
         logger.warning(f'[SendMessage] {cursor.fetchwarnings()}')
         logger.info(f'[SendMessage] Message successfully was sent from <{current_user}> to <{receiver}>')
     except Error as e:
-        logger.exception(f'[SendMessage] There is an unhandled problem in sending message to <{receiver}>.')
+        if e.errno == 9981:                                                                     # current user was banned by receiver of message
+            logger.error(f'[SendMessage] {e.msg}')
+        elif e.errno == 9991:                                                                   # there is no message with this tweet_id
+            logger.error(f'[SendMessage] {e.msg}')
+        elif e.errno == 9980:                                                                   # current user was banned by sender of forwarded tweet
+            logger.error(f'[SendMessage] {e.msg}')
+        else:
+            logger.exception(f'[SendMessage] There is an unhandled problem in sending message to <{receiver}>.')
 
 def RemoveBan(logger, cursor, username : str):
     try:
@@ -51,7 +58,7 @@ def RemoveBan(logger, cursor, username : str):
         if e.errno == 9992:                                                                     # there is no row for this ban property
             logger.error(f'[RemoveBan] {e.msg}')
         else:
-            logger.error('[RemoveBan] There is an unhandled problem in unbanning process')
+            logger.exception('[RemoveBan] There is an unhandled problem in unbanning process')
 
 def UserLoginHistory(logger, cursor, username : str):
     try:
@@ -68,7 +75,7 @@ def UserLoginHistory(logger, cursor, username : str):
         if e.errno == 9990:                                                                 # there is no user with this user name in database
             logger.error(f'[UserLoginHistory] {e.msg}')
         else:
-            logger.error('[UserLoginHistory] There is an unhandled problem in this process.')
+            logger.exception('[UserLoginHistory] There is an unhandled problem in this process.')
 
 def LikeTweet(logger, cursor, tweet_id : int):
     try:
@@ -84,4 +91,4 @@ def LikeTweet(logger, cursor, tweet_id : int):
         elif e.errno == 1062:                                                                   # duplicate of primary key
             logger.error('[LikeTweet] You have already liked this tweet.')
         else:
-            logger.error('[LikeTweet] There is an unhandled problem in this process.')
+            logger.exception('[LikeTweet] There is an unhandled problem in this process.')
