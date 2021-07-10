@@ -178,3 +178,22 @@ def UnfollowUser(logger, cursor, username : str):
             logger.error(f'[UnfollowUser] {e.msg}')
         else:
             logger.exception('[UnfollowUser] There is an unhandled problem in this process')
+
+
+def PopularTweets(logger, cursor):
+
+    try:
+        
+        cursor.callproc('PopularTweets')
+        logger.warning(f'[PopularTweets] {cursor.fetchwarnings()}')
+
+        for res in cursor.stored_results():
+            data = res.fetchall()
+            return data
+
+    except Error as e:
+
+        if e.errno == 9993:                                                                      # there is no logined user
+            logger.error(f'[PopularTweets] {e.msg}')
+        else:
+            logger.exception('[PopularTweets] There is an unhandled problem in this process')
