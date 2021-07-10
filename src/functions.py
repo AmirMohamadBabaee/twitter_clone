@@ -218,3 +218,23 @@ def MyTweets(logger, cursor):
             logger.error(f'[MyTweets] {e.msg}')
         else:
             logger.exception('[MyTweets] There is an unhandled problem in this process')
+
+
+def TweetsWithHashtag(logger, cursor, hashtag : str):
+
+    try:
+
+        cursor.callproc('TweetsWithHashtag', args=(hashtag,))
+        logger.warning(f'[TweetsWithHashtag] {cursor.fetchwarnings()}')
+
+        for res in cursor.stored_results():
+            data = res.fetchall()
+            logger.info(f'[TweetsWithHashtag] Tweets with <{hashtag}> successfully retrieved.')
+            return data
+
+    except Error as e:
+
+        if e.errno == 9993:
+            logger.error(f'[TweetsWithHashtag] {e.msg}')
+        else:
+            logger.exception('[TweetsWithHashtag] There is an unhandled problem in this process.')
