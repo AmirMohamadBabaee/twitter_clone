@@ -189,6 +189,7 @@ def PopularTweets(logger, cursor):
 
         for res in cursor.stored_results():
             data = res.fetchall()
+            logger.info('[PopularTweets] Popular Tweets successfully retrieved.')
             return data
 
     except Error as e:
@@ -197,3 +198,23 @@ def PopularTweets(logger, cursor):
             logger.error(f'[PopularTweets] {e.msg}')
         else:
             logger.exception('[PopularTweets] There is an unhandled problem in this process')
+
+
+def MyTweets(logger, cursor):
+    try:
+
+        current_user = get_current_user(logger, cursor)
+        cursor.callproc('MyTweets')
+        logger.warning(f'[MyTweets] {cursor.fetchwarnings()}')
+
+        for res in cursor.stored_results():
+            data = res.fetchall()
+            logger.info('[MyTweets] My Tweets successfully retrieved.')
+            return data
+
+    except Error as e:
+
+        if e.errno == 9993:                                                                      # there is no logined user
+            logger.error(f'[MyTweets] {e.msg}')
+        else:
+            logger.exception('[MyTweets] There is an unhandled problem in this process')
