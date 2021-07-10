@@ -8,3 +8,5 @@
 9992 -> 'This user was not banned!'
 9993 -> 'There is no logined user.'
 9994 -> 'Your password is not correct. Please try again.'
+9995 -> 'There is no user with this username.'
+9996 -> 'This user hasn`t been followed by you.'
