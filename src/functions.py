@@ -39,7 +39,13 @@ def Login(logger, cursor, username : str, password : str):
         return True
 
     except Error as e:
-        logger.exception('[Login] There is an unhandled problem in login procedure.')
+
+        if e.errno == 9990:                                                                     # username not exists between registered users
+            logger.error(f'[Login] {e.msg}')
+        elif e.errno == 9994:                                                                   # user exists but password is not correct
+            logger.error(f'[Login] {e.msg}')
+        else:
+            logger.exception('[Login] There is an unhandled problem in login procedure.')
 
 
 def SendTweet(logger, cursor, content : str):
