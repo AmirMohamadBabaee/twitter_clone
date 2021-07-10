@@ -152,6 +152,23 @@ END"""
 # Login Procedure
 init_Login_procedure_query = """CREATE PROCEDURE Login(username_login varchar(20), password_login varchar(128))
 BEGIN
+	IF username_login NOT IN (
+		SELECT username
+        FROM user
+    ) THEN
+		SIGNAL SQLSTATE '02000'
+			SET MESSAGE_TEXT = 'User not found! Please sign up first.', MYSQL_ERRNO = 9990;
+    END IF;
+    
+    IF NOT EXISTS (
+		SELECT *
+        FROM user
+        where (username, password) = (username_login, sha2(password_login, 512))
+    ) THEN
+		SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'Your password is not correct. Please try again.', MYSQL_ERRNO = 9994;
+    END IF;
+
 	INSERT INTO last_login
 		SELECT username, now() 
 		FROM user
