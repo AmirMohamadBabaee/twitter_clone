@@ -1,0 +1,9 @@
+1062 -> duplicate of primary key (mysql default)
+
+9980 -> 'Sorry! You were banned by sender of this tweet.'
+9981 -> 'Sorry! You were banned by receiver of this message.'
+
+9990 -> 'User not found! Please sign up first.'
+9991 -> 'Selected Tweet wasn`t found.'
+9992 -> 'This user was not banned!'
+9993 -> 'There is no logined user.'
