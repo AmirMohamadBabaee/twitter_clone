@@ -156,3 +156,25 @@ def LikeTweet(logger, cursor, tweet_id : int):
             logger.error('[LikeTweet] You have already liked this tweet.')
         else:
             logger.exception('[LikeTweet] There is an unhandled problem in this process.')
+
+
+def UnfollowUser(logger, cursor, username : str):
+    
+    try:
+
+        current_user = get_current_user(logger, cursor)
+        cursor.callproc('UnfollowUser', args=(username,))
+        logger.warning(f'[UnfollowUser] {cursor.fetchwarnings()}')
+        logger.info(f'[UnfollowUser] user <{current_user}> unfollowed <{username}>')
+        return True
+
+    except Error as e:
+
+        if e.errno == 9993:                                                                     # there is no logined user
+            logger.error(f'[UnfollowUser] {e.msg}')
+        elif e.errno == 9995:                                                                   # there is no registered user with this username
+            logger.error(f'[UnfollowUser] {e.msg}')
+        elif e.errno == 9996:                                                                   # this user has not been followed by current user
+            logger.error(f'[UnfollowUser] {e.msg}')
+        else:
+            logger.exception('[UnfollowUser] There is an unhandled problem in this process')
