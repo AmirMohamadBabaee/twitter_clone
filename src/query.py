@@ -361,6 +361,29 @@ init_UnfollowUser_procedure_query = """CREATE PROCEDURE UnfollowUser(followed_us
 BEGIN
 	DECLARE currentUser varchar(20);
     SET currentUser = CurrentUser();
+    
+    IF currentUser IS NULL THEN
+		SIGNAL SQLSTATE '02000'
+			SET MESSAGE_TEXT = 'There is no logined user.', MYSQL_ERRNO = 9993;
+    END IF;
+    
+    IF followed_username NOT IN (
+		SELECT username
+        FROM user
+    ) THEN
+		SIGNAL SQLSTATE '02000'
+			SET MESSAGE_TEXT = 'There is no user with this username.', MYSQL_ERRNO = 9995;
+    END IF;
+    
+    IF NOT EXISTS (
+		SELECT *
+        from follow
+        WHERE (following, followed) = (currentUser, followed_username)
+    ) THEN
+		SIGNAL SQLSTATE '02000'
+			SET MESSAGE_TEXT = 'This user hasn`t been followed by you.', MYSQL_ERRNO = 9996;
+    END IF;
+    
 	DELETE FROM follow
 	WHERE (following, followed) = (currentUser, followed_username);
 END"""
