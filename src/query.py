@@ -419,6 +419,12 @@ init_MyTweets_procedure_query = """CREATE PROCEDURE MyTweets()
 BEGIN
 	DECLARE currentUser varchar(20);
     SET currentUser = CurrentUser();
+    
+    IF currentUser IS NULL THEN
+		SIGNAL SQLSTATE '02000'
+			SET MESSAGE_TEXT = 'There is no logined user.', MYSQL_ERRNO = 9993;
+    END IF;
+    
 	SELECT * 
 	FROM tweet
 	WHERE user_sender = currentUser;
