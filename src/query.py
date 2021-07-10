@@ -393,6 +393,12 @@ init_PopularTweets_procedure_query = """CREATE PROCEDURE PopularTweets()
 BEGIN
 	DECLARE currentUser varchar(20);
 	SET currentUser = CurrentUser();
+    
+    IF currentUser IS NULL THEN
+		SIGNAL SQLSTATE '02000'
+			SET MESSAGE_TEXT = 'There is no logined user.', MYSQL_ERRNO = 9993;
+    END IF;
+    
 	SELECT t.tweet_id, t.body, t.date_sent, t.user_sender, t.parent_id, tl.likes
 	FROM tweet t
 	LEFT JOIN (
@@ -403,7 +409,7 @@ BEGIN
 	WHERE t.user_sender NOT IN (
 		SELECT user_banning
 		FROM ban
-		WHERE user_banned = currentUser()
+		WHERE user_banned = currentUser
 	) 
 	ORDER BY likes DESC;
 END"""
