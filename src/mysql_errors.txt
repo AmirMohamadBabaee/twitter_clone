@@ -7,3 +7,4 @@
 9991 -> 'Selected Tweet wasn`t found.'
 9992 -> 'This user was not banned!'
 9993 -> 'There is no logined user.'
+9994 -> 'Your password is not correct. Please try again.'
