@@ -260,3 +260,24 @@ def TweetLikesNumber(logger, cursor, tweet_id : int):
             logger.error(f'[TweetLikesNumber] {e.msg}')
         else:
             logger.exception('[TweetLikesNumber] There is an unhandled problem in this process.')
+
+
+def FollowingTweets(logger, cursor):
+
+    try:
+
+        current_user = get_current_user(logger, cursor)
+        cursor.callproc('FollowingTweets')
+        logger.warning(f'[FollowingTweets] {cursor.fetchwarnings()}')
+
+        for res in cursor.stored_results():
+            data = res.fetchall()
+            logger.info(f'[FollowingTweets] Tweets of followed user by user <{current_user}>')
+            return data
+
+    except Error as e:
+
+        if e.errno == 9993:
+            logger.error(f'[FollowingTweets] {e.msg}')
+        else:
+            logger.exception('[FollowingTweets] There is an unhandled problem in this process.')
