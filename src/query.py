@@ -163,6 +163,12 @@ init_SendTweet_procedure_query = """CREATE PROCEDURE SendTweet(content varchar(2
 BEGIN
 	DECLARE currentUser varchar(20);
     set currentUser = CurrentUser();
+    
+    IF currentUser IS NULL THEN
+		SIGNAL SQLSTATE '02000'
+			SET MESSAGE_TEXT = 'There is no logined user.', MYSQL_ERRNO = 9993;
+    END IF;
+    
 	INSERT INTO tweet(body, date_sent, user_sender) 
 		SELECT content, curdate(), username
 		FROM user
@@ -174,6 +180,11 @@ init_SendMessage_procedure_query = """CREATE PROCEDURE SendMessage(content varch
 BEGIN
 	DECLARE currentUser varchar(20);
     SET currentUser = CurrentUser();
+
+	IF currentUser IS NULL THEN
+		SIGNAL SQLSTATE '02000'
+			SET MESSAGE_TEXT = 'There is no logined user.', MYSQL_ERRNO = 9993;
+    END IF;
     
     IF currentUser IN (
 		SELECT user_banned
@@ -233,6 +244,11 @@ init_RemoveBan_procedure_query = """CREATE PROCEDURE RemoveBan(user_banned_param
 BEGIN
 	DECLARE currentUser varchar(20);
     SET currentUser = CurrentUser();
+
+	IF currentUser IS NULL THEN
+		SIGNAL SQLSTATE '02000'
+			SET MESSAGE_TEXT = 'There is no logined user.', MYSQL_ERRNO = 9993;
+    END IF;
     
     IF NOT EXISTS (
 		SELECT *
@@ -284,6 +300,11 @@ init_LikeTweet_procedure_query = """CREATE PROCEDURE LikeTweet(tweet_id_param in
 BEGIN
 	DECLARE currentUser varchar(20);
     SET currentUser = CurrentUser();
+
+	IF currentUser IS NULL THEN
+		SIGNAL SQLSTATE '02000'
+			SET MESSAGE_TEXT = 'There is no logined user.', MYSQL_ERRNO = 9993;
+    END IF;
 
 	IF NOT EXISTS (
 		SELECT tweet_id
