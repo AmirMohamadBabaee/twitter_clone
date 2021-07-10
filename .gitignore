@@ -155,3 +155,4 @@ cython_debug/
 .history
 .ionide
 
+.vscode/settings.json
