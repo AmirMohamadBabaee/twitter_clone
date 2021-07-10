@@ -234,7 +234,29 @@ def TweetsWithHashtag(logger, cursor, hashtag : str):
 
     except Error as e:
 
-        if e.errno == 9993:
+        if e.errno == 9993:                                                                      # there is no logined user
             logger.error(f'[TweetsWithHashtag] {e.msg}')
         else:
             logger.exception('[TweetsWithHashtag] There is an unhandled problem in this process.')
+
+
+def TweetLikesNumber(logger, cursor, tweet_id : int):
+
+    try:
+
+        cursor.callproc('TweetLikesNumber', args=(tweet_id,))
+        logger.warning(f'[TweetLikesNumber] {cursor.fetchwarnings()}')
+
+        for res in cursor.stored_results():
+            data = res.fetchall()
+            logger.info(f'[TweetLikesNumber] Likes number of tweet <{tweet_id}> successfully retrieved.')
+            return data[0][0]
+
+    except Error as e:
+
+        if e.errno == 9993:                                                                     # there is no logined user
+            logger.error(f'[TweetLikesNumber] {e.msg}')
+        elif e.errno == 9991:                                                                   # there is no tweet with this tweet id
+            logger.error(f'[TweetLikesNumber] {e.msg}')
+        else:
+            logger.exception('[TweetLikesNumber] There is an unhandled problem in this process.')
