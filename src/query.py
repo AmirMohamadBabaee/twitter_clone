@@ -518,6 +518,29 @@ init_TweetsOf_procedure_query = """CREATE PROCEDURE TweetsOf(sender_username var
 BEGIN
 	DECLARE currentUser varchar(20);
     SET currentUser = CurrentUser();
+    
+    IF currentUser IS NULL THEN
+		SIGNAL SQLSTATE '02000'
+			SET MESSAGE_TEXT = 'There is no logined user.', MYSQL_ERRNO = 9993;
+    END IF;
+    
+    IF sender_username NOT IN (
+		SELECT username
+        FROM user
+    ) THEN
+		SIGNAL SQLSTATE '02000'
+			SET MESSAGE_TEXT = 'There is no user with this username.', MYSQL_ERRNO = 9995;
+    END IF;
+    
+    IF currentUser IN (
+		SELECT user_banned
+        FROM ban
+        WHERE user_banning = sender_username
+    ) THEN
+		SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'Sorry! You were banned by this user.', MYSQL_ERRNO = 9982;
+    END IF;
+    
 	SELECT *
 	FROM tweet
 	WHERE user_sender = sender_username
