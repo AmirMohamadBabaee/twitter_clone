@@ -717,6 +717,25 @@ init_FollowUser_procedure_query = """CREATE PROCEDURE FollowUser(followed_userna
 BEGIN
 	DECLARE currentUser varchar(20);
     SET currentUser = CurrentUser();
+    
+    IF currentUser IS NULL THEN
+		SIGNAL SQLSTATE '02000'
+			SET MESSAGE_TEXT = 'There is no logined user.', MYSQL_ERRNO = 9993;
+    END IF;
+    
+    IF followed_username NOT IN (
+		SELECT username
+        FROM user
+    ) THEN
+		SIGNAL SQLSTATE '02000'
+			SET MESSAGE_TEXT = 'There is no user with this username.', MYSQL_ERRNO = 9995;
+    END IF;
+    
+    IF currentUser = followed_username THEN
+		SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'Sorry! You cannot follow yourself', MYSQL_ERRNO = 9983;
+    END IF;
+    
 	INSERT INTO follow(following, followed)
 		SELECT currentUser, followed_username
 		WHERE currentUser in (SELECT username FROM user) 
