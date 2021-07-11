@@ -305,3 +305,25 @@ def TweetsOf(logger, cursor, username : str):
             logger.error(f'[TweetsOf] {e.msg}')
         else:
             logger.exception('[TweetsOf] There is an unhandled problem in this process.')
+
+
+def MessageSenderToMe(logger, cursor):
+
+    try:
+
+        current_user = get_current_user(logger, cursor)
+        cursor.callproc('MessageSenderToMe')
+        logger.warning(f'[MessageSenderToMe] {cursor.fetchwarnings()}')
+
+        for res in cursor.stored_results():
+            data = res.fetchall()
+            logger.info(f'[MessageSenderToMe] Message Senders to user <{current_user}> successfully retrieved.')
+            data = list(map(lambda x : x[0], data))
+            return data
+
+    except Error as e:
+
+        if e.errno == 9993:
+            logger.error(f'[MessageSenderToMe] {e.msg}')
+        else:
+            logger.exception('[MessageSenderToMe] There is an unhandled problem in this process')
