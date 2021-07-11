@@ -423,3 +423,27 @@ def FollowUser(logger, cursor, username : str):
             logger.error('[FollowUser] You have already followed this user.')
         else:
             logger.exception('[FollowUser] There is an unhandled problem in this process')
+
+
+def AddBan(logger, cursor, username : str):
+
+    try:
+
+        current_user = get_current_user(logger, cursor)
+        cursor.callproc('AddBan', args=(username,))
+        logger.warning(f'[AddBan] {cursor.fetchwarnings()}')
+        logger.info(f'[AddBan] user <{current_user}> successfully banned user <{username}>.')
+        return True
+
+    except Error as e:
+
+        if e.errno == 9993:                                                                     # there is no logined user
+            logger.error(f'[AddBan] {e.msg}')
+        elif e.errno == 9995:                                                                   # there is no registered user with this username
+            logger.error(f'[AddBan] {e.msg}')
+        elif e.errno == 9984:                                                                   # current user cannot ban himself/herself
+            logger.error(f'[AddBan] {e.msg}')
+        elif e.errno == 1062:                                                                   # duplicate of primary key
+            logger.error(f'[AddBan] You have already benned this user.')
+        else:
+            logger.exception('[AddBan] There is an unhandled problem in this process')
