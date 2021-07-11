@@ -575,6 +575,34 @@ init_UsersLikeTweet_procedure_query = """CREATE PROCEDURE UsersLikeTweet(tweet_i
 BEGIN
 	DECLARE currentUser varchar(20);
     SET currentUser = CurrentUser();
+    
+    IF currentUser IS NULL THEN
+		SIGNAL SQLSTATE '02000'
+			SET MESSAGE_TEXT = 'There is no logined user.', MYSQL_ERRNO = 9993;
+    END IF;
+    
+    IF NOT EXISTS (
+		SELECT tweet_id
+        FROM tweet
+        WHERE tweet_id = tweet_id_param
+    ) THEN
+		SIGNAL SQLSTATE '02000'
+			SET MESSAGE_TEXT = 'Selected Tweet wasn`t found.', MYSQL_ERRNO = 9991;
+    END IF;
+    
+    IF currentUser IN (
+		SELECT user_banned
+		FROM ban
+		WHERE user_banning = (
+			SELECT user_sender
+            FROM tweet
+            WHERE tweet_id = tweet_id_param
+		)
+    ) THEN
+		SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'Sorry! You were banned by sender of this tweet.', MYSQL_ERRNO = 9980;
+    END IF;
+    
 	SELECT username
 	FROM tweet_like tl
 	WHERE tl.tweet_id = tweet_id_param
