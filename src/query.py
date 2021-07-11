@@ -557,6 +557,12 @@ init_MessageSenderToMe_procedure_query = """CREATE PROCEDURE MessageSenderToMe()
 BEGIN
 	DECLARE currentUser varchar(20);
     SET currentUser = CurrentUser();
+    
+    IF currentUser IS NULL THEN
+		SIGNAL SQLSTATE '02000'
+			SET MESSAGE_TEXT = 'There is no logined user.', MYSQL_ERRNO = 9993;
+    END IF;
+    
 	SELECT DISTINCT user_sender
 	FROM message
 	WHERE user_reciever = currentUser
