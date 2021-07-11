@@ -447,3 +447,27 @@ def AddBan(logger, cursor, username : str):
             logger.error(f'[AddBan] You have already benned this user.')
         else:
             logger.exception('[AddBan] There is an unhandled problem in this process')
+
+
+def SendComment(logger, cursor, content : str, tweet_id : int):
+
+    try:
+
+        current_user = get_current_user(logger, cursor)
+        cursor.callproc('SendComment', args=(content, tweet_id,))
+        logger.warning(f'[SendComment] {cursor.fetchwarnings()}')
+        logger.info(f'[SendComment] user <{current_user}> successfully commented on tweet <{tweet_id}>.')
+        return True
+
+    except Error as e:
+
+        if e.errno == 9993:                                                                     # there is no logined user
+            logger.error(f'[SendComment] {e.msg}')
+        elif e.errno == 9991:                                                                   # there is no tweet with this tweet id
+            logger.error(f'[SendComment] {e.msg}')
+        elif e.errno == 9980:                                                                   # current user was banned by sender of tweet
+            logger.error(f'[SendComment] {e.msg}')
+        elif e.errno == 1062:                                                                   # duplicate of primary key
+            logger.error(f'[SendComment] This comment is duplicated.')
+        else:
+            logger.exception('[SendComment] There is an unhandled problem in this process')
