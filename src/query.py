@@ -748,10 +748,30 @@ init_AddBan_procedure_query = """CREATE PROCEDURE AddBan(user_banned_param varch
 BEGIN
 	DECLARE currentUser varchar(20);
     SET currentUser = CurrentUser();
+    
+    IF currentUser IS NULL THEN
+		SIGNAL SQLSTATE '02000'
+			SET MESSAGE_TEXT = 'There is no logined user.', MYSQL_ERRNO = 9993;
+    END IF;
+    
+    IF user_banned_param NOT IN (
+		SELECT username
+        FROM user
+    ) THEN
+		SIGNAL SQLSTATE '02000'
+			SET MESSAGE_TEXT = 'There is no user with this username.', MYSQL_ERRNO = 9995;
+    END IF;
+    
+    IF currentUser = user_banned_param THEN
+		SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'Sorry! You connot ban yourself', MYSQL_ERRNO = 9984;
+    END IF;
+    
 	INSERT INTO ban(user_banning, user_banned)
 		SELECT currentUser, user_banned_param
 		WHERE currentUser IN (SELECT username FROM user)
-			and user_banned_param IN (SELECT username FROM user);
+			and user_banned_param IN (SELECT username FROM user)
+            and currentUser <> user_banned_param;
 END"""
 
 # SendComment Procedure
