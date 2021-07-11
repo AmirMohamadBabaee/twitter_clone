@@ -352,3 +352,26 @@ def UsersLikeTweet(logger, cursor, tweet_id : int):
             logger.error(f'[UsersLikeTweet] {e.msg}')
         else:
             logger.exception('[UsersLikeTweet] There is an unhandled problem in this process.')
+
+
+def MessagesToMe(logger, cursor, username : str):
+
+    try:
+
+        current_user = get_current_user(logger, cursor)
+        cursor.callproc('MessagesToMe', args=(username,))
+        logger.warning(f'[MessagesToMe] {cursor.fetchwarnings()}')
+
+        for res in cursor.stored_results():
+            data = res.fetchall()
+            logger.info(f'[MessagesToMe] Messages from user <{username}> to user <{current_user}> successfully retrieved.')
+            return data
+
+    except Error as e:
+
+        if e.errno == 9993:                                                                     # there is no logined user
+            logger.error(f'[MessagesToMe] {e.msg}')
+        elif e.errno == 9995:                                                                   # there is no registered user with this username
+            logger.error(f'[MessagesToMe] {e.msg}')
+        else:
+            logger.exception('[MessagesToMe] There is an unhandled problem in this process')
