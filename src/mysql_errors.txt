@@ -2,6 +2,7 @@
 
 9980 -> 'Sorry! You were banned by sender of this tweet.'
 9981 -> 'Sorry! You were banned by receiver of this message.'
+9982 -> 'Sorry! You were banned by this user.'
 
 9990 -> 'User not found! Please sign up first.'
 9991 -> 'Selected Tweet wasn`t found.'
