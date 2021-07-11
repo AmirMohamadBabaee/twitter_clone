@@ -399,3 +399,27 @@ def CommentOf(logger, cursor, tweet_id):
             logger.error(f'[CommentOf] {e.msg}')
         else:
             logger.exception('[CommentOf] There is an unhandled problem in this process')
+
+
+def FollowUser(logger, cursor, username : str):
+
+    try:
+
+        current_user = get_current_user(logger, cursor)
+        cursor.callproc('FollowUser', args=(username,))
+        logger.warning(f'[FollowUser] {cursor.fetchwarnings()}')
+        logger.info(f'user <{current_user}> successfully followed user <{username}>.')
+        return True
+
+    except Error as e:
+
+        if e.errno == 9993:                                                                     # there is no logined user
+            logger.error(f'[FollowUser] {e.msg}')
+        elif e.errno == 9995:                                                                   # there is no registered user with this username
+            logger.error(f'[FollowUser] {e.msg}')
+        elif e.errno == 9983:                                                                   # current user cannot follow himself/herself
+            logger.error(f'[FollowUser] {e.msg}')
+        elif e.errno == 1062:                                                                   # duplicate of primary key
+            logger.error('[FollowUser] You have already followed this user.')
+        else:
+            logger.exception('[FollowUser] There is an unhandled problem in this process')
