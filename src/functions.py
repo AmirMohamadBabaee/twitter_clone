@@ -102,7 +102,7 @@ def RemoveBan(logger, cursor, username : str):
     except Error as e:
 
         if e.errno == 9993:                                                                     # there is no logined user
-            logger.error(f'[SendTweet] {e.msg}')
+            logger.error(f'[RemoveBan] {e.msg}')
         elif e.errno == 9992:                                                                   # there is no row for this ban property
             logger.error(f'[RemoveBan] {e.msg}')
         else:
@@ -147,7 +147,7 @@ def LikeTweet(logger, cursor, tweet_id : int):
     except Error as e:
 
         if e.errno == 9993:                                                                     # there is no logined user
-            logger.error(f'[SendTweet] {e.msg}')
+            logger.error(f'[LikeTweet] {e.msg}')
         elif e.errno == 9991:                                                                   # there is no tweet with this tweet id
             logger.error(f'[LikeTweet] {e.msg}')
         elif e.errno == 9980:                                                                   # current user was banned by sender of tweet
@@ -327,3 +327,28 @@ def MessageSenderToMe(logger, cursor):
             logger.error(f'[MessageSenderToMe] {e.msg}')
         else:
             logger.exception('[MessageSenderToMe] There is an unhandled problem in this process')
+
+
+def UsersLikeTweet(logger, cursor, tweet_id : int):
+
+    try:
+
+        cursor.callproc('UsersLikeTweet', args=(tweet_id,))
+        logger.warning(f'[UsersLikeTweet] {cursor.fetchwarnings()}')
+
+        for res in cursor.stored_results():
+            data = res.fetchall()
+            logger.info(f'[UsersLikeTweet] Users who liked tweet <{tweet_id}> successfully retrieved.')
+            data = list(map(lambda x : x[0], data))
+            return data
+
+    except Error as e:
+
+        if e.errno == 9993:                                                                     # there is no logined user
+            logger.error(f'[UsersLikeTweet] {e.msg}')
+        elif e.errno == 9991:                                                                   # there is no tweet with this tweet id
+            logger.error(f'[UsersLikeTweet] {e.msg}')
+        elif e.errno == 9980:                                                                   # current user was banned by sender of tweet
+            logger.error(f'[UsersLikeTweet] {e.msg}')
+        else:
+            logger.exception('[UsersLikeTweet] There is an unhandled problem in this process.')
