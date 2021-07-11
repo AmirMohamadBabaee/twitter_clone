@@ -277,7 +277,31 @@ def FollowingTweets(logger, cursor):
 
     except Error as e:
 
-        if e.errno == 9993:
+        if e.errno == 9993:                                                                     # there is no logined user
             logger.error(f'[FollowingTweets] {e.msg}')
         else:
             logger.exception('[FollowingTweets] There is an unhandled problem in this process.')
+
+
+def TweetsOf(logger, cursor, username : str):
+
+    try:
+
+        cursor.callproc('TweetsOf', args=(username,))
+        logger.warning(f'[TweetsOf] {cursor.fetchwarnings()}')
+
+        for res in cursor.stored_results():
+            data = res.fetchall()
+            logger.info(f'[TweetsOf] Tweets of user <{username}> successfully retrieved.')
+            return data
+
+    except Error as e:
+
+        if e.errno == 9993:                                                                      # there is no logined user
+            logger.error(f'[TweetsOf] {e.msg}')
+        elif e.errno == 9995:                                                                    # there is no registered user with this username
+            logger.error(f'[TweetsOf] {e.msg}')
+        elif e.errno == 9982:                                                                    # current user was banned by user with this username
+            logger.error(f'[TweetsOf] {e.msg}')
+        else:
+            logger.exception('[TweetsOf] There is an unhandled problem in this process.')
