@@ -375,3 +375,27 @@ def MessagesToMe(logger, cursor, username : str):
             logger.error(f'[MessagesToMe] {e.msg}')
         else:
             logger.exception('[MessagesToMe] There is an unhandled problem in this process')
+
+
+def CommentOf(logger, cursor, tweet_id):
+
+    try:
+
+        cursor.callproc('CommentOf', args=(tweet_id,))
+        logger.warning(f'[CommentOf] {cursor.fetchwarnings()}')
+
+        for res in cursor.stored_results():
+            data = res.fetchall()
+            logger.info(f'[CommentOf] Comments of tweet <{tweet_id}> successfully retrieved.')
+            return data
+
+    except Error as e:
+
+        if e.errno == 9993:                                                                     # there is no logined user
+            logger.error(f'[CommentOf] {e.msg}')
+        elif e.errno == 9991:                                                                   # there is no tweet with this tweet id
+            logger.error(f'[CommentOf] {e.msg}')
+        elif e.errno == 9980:                                                                   # current user was banned by sender of tweet
+            logger.error(f'[CommentOf] {e.msg}')
+        else:
+            logger.exception('[CommentOf] There is an unhandled problem in this process')
