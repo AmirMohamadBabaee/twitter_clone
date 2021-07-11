@@ -623,13 +623,28 @@ BEGIN
 END"""
 
 # MessagesToMe Procedure
-init_MessagesToMe_procedure_query = """CREATE PROCEDURE MessagesToMe()
+init_MessagesToMe_procedure_query = """CREATE PROCEDURE MessagesToMe(sender_username varchar(20))
 BEGIN
 	DECLARE currentUser varchar(20);
     SET currentUser = CurrentUser();
+    
+    IF currentUser IS NULL THEN
+		SIGNAL SQLSTATE '02000'
+			SET MESSAGE_TEXT = 'There is no logined user.', MYSQL_ERRNO = 9993;
+    END IF;
+    
+    IF sender_username NOT IN (
+		SELECT username
+        FROM user
+    ) THEN
+		SIGNAL SQLSTATE '02000'
+			SET MESSAGE_TEXT = 'There is no user with this username.', MYSQL_ERRNO = 9995;
+    END IF;
+    
 	SELECT * 
 	FROM message
-	WHERE user_reciever = currentUser
+	WHERE user_sender = sender_username
+		AND user_reciever = currentUser
 		AND (
 			tweet_id is null OR
 			tweet_id is not null AND(
