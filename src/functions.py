@@ -119,7 +119,7 @@ def UserLoginHistory(logger, cursor, username : str):
         if cursor.with_rows:
             for res in cursor.stored_results():
                 data = res.fetchall()
-                login_history = [tup[1] for tup in data]
+                login_history = [(tup[1],) for tup in data]
 
                 if len(login_history) > 0:
                     logger.info(f'[UserLoginHistory] <{username}> login history Retrieved successfully.')
