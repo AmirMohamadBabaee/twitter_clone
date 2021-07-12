@@ -1,0 +1,173 @@
+ /$$$$$$$$            /$$   /$$     /$$                        
+|__  $$__/           |__/  | $$    | $$                        
+   | $$ /$$  /$$  /$$ /$$ /$$$$$$ /$$$$$$    /$$$$$$   /$$$$$$ 
+   | $$| $$ | $$ | $$| $$|_  $$_/|_  $$_/   /$$__  $$ /$$__  $$
+   | $$| $$ | $$ | $$| $$  | $$    | $$    | $$$$$$$$| $$  \__/
+   | $$| $$ | $$ | $$| $$  | $$ /$$| $$ /$$| $$_____/| $$      
+   | $$|  $$$$$/$$$$/| $$  |  $$$$/|  $$$$/|  $$$$$$$| $$      
+   |__/ \_____/\___/ |__/   \___/   \___/   \_______/|__/      
+                                                               
+                                                               
+We are so proud that see you using our great application :)
+
+
+SignUp command
+You can use this command to create your first account and enjoy a lot of cool tweets which are post everyday
+
+inputs:
+    username    -> string at most with 20 characters which must be unique
+    firstname   -> string at most with 20 characters
+    lastname    -> string at most with 20 characters
+    password    -> password of your account (please set a powerful password and do not use frequent passwords like 123456)
+    biography   -> string at most with 64 characters, a text that describe you as good as possible
+    birthdate   -> date with form %Y-%m-%d like 2020-03-09
+
+
+Login command
+You can use this command to login to your account and start using this fabulous app.
+
+inputs:
+    username    -> string at most with 20 characters
+    password    -> password of your account
+
+
+History command
+You can find last login of your self and other users of Twitter with this powerful command.
+
+inputs:
+    username    -> string at most with 20 characters
+
+
+Follow command
+You can use this command to follow users has registered in Twitter to follow their activities
+and their tweets.
+
+inputs:
+    username    -> string at most with 20 characters
+
+
+Unfollow command
+You can unfollow users that you have already followed
+
+inputs:
+    username    -> string at most with 20 characters
+
+
+Ban command
+You can ban users who seems have ironic tweets or something worse than we can think
+
+inputs:
+    username    -> string at most with 20 characters
+
+
+Unban command
+You can unban each user who has been banned by you
+
+inputs:
+    username    -> string at most with 20 characters
+
+
+Tweet command
+You can use this command to send your own tweet to show to the World that you are so creative
+and so cool. just you need write your text after this command
+
+inputs:
+    content     -> string content at most with 256 characters
+
+
+LikeTweet command
+You can like tweets which you think are beautiful, creative and innovative.
+
+inputs: 
+    tweet_id    -> id of tweet you are interested to like it which is a integer number
+
+
+TweetLikesNum command
+Find out how many users like a tweet. likes number can be an indicator for users interest
+
+inputs:
+    tweet_id    -> id of tweet you are interested to see its like number
+
+
+Likers
+You can see users who like a special tweet, actually users who they didn`t ban you.
+
+inputs:
+    tweet_id    -> id of tweet which you like to see users who like it
+
+
+Comment Command
+You can use this comment to show your comment about a tweet and share your opinion with other people
+
+inputs:
+    content     -> string at most with 256 characters
+    tweet_id    -> id of tweet which you want add a comment to it
+
+
+CommentsOf command
+This command return comments which replied to a specific tweet
+
+inputs:
+    tweet_id    -> id of tweet that you want see its comments.
+
+
+TweetsOf command
+Find out Tweets of every user which is in twitter platform.
+
+inputs:
+    username    -> string at most with 20 character
+
+
+HashtagTweets command
+You can find every tweets with specific hashtag.
+
+inputs:
+    hashtag     -> string with exactly 6 character which starts with #
+
+
+PopularTweets command
+You can find hot tweets which are so popular and reacted to them.
+
+without any input
+
+
+FollowingTweets command
+You can check current activities of your following easier than what you can imagine
+
+without any input
+
+
+MyTweets Command
+You can find your sent tweets by this command
+
+without any inputs
+
+
+Message Command
+Message your friends directly by using message feature of Twitter
+
+inputs:
+    content     -> string at most with 256 characters
+    receiver    -> username of any user of this platform
+    tweet_id    -> id of tweet you want to forward for your friend(optional)
+
+
+MessageInbox command
+You can find out which users have already send a message for you.
+
+without any inputs
+
+
+MessagesFrom command
+This command let you to see sent message from specific user to you
+
+inputs:
+    username    -> string at most with 20 characters
+
+
+Help command (h)
+This command print this text.
+
+
+Quit command (q)
+this command shutdown Twitter program
