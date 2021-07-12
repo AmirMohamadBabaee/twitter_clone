@@ -104,6 +104,17 @@ if __name__ == '__main__':
                 logger.info('initialize db.')
                 init_db(connection, cursor, logger)
                 
+                print("""
+ /$$$$$$$$            /$$   /$$     /$$                        
+|__  $$__/           |__/  | $$    | $$                        
+   | $$ /$$  /$$  /$$ /$$ /$$$$$$ /$$$$$$    /$$$$$$   /$$$$$$ 
+   | $$| $$ | $$ | $$| $$|_  $$_/|_  $$_/   /$$__  $$ /$$__  $$
+   | $$| $$ | $$ | $$| $$  | $$    | $$    | $$$$$$$$| $$  \__/
+   | $$| $$ | $$ | $$| $$  | $$ /$$| $$ /$$| $$_____/| $$      
+   | $$|  $$$$$/$$$$/| $$  |  $$$$/|  $$$$/|  $$$$$$$| $$      
+   |__/ \_____/\___/ |__/   \___/   \___/   \_______/|__/      
+                                                               
+                """)
                 print('Welcome To Twitter\n')
                 
                 interactive = True
@@ -451,6 +462,12 @@ if __name__ == '__main__':
                             print(f'There is no tweet from your followings.')
 
                     elif com.lower() == 'mytweets':
+                        """
+                        MyTweets Command
+                        You can find your sent tweets by this command
+
+                        without any inputs
+                        """
 
                         data = functions.MyTweets(logger, cursor)
                         if data:
@@ -462,13 +479,74 @@ if __name__ == '__main__':
                             print(f'there is no tweet from you :(')
 
                     elif com.lower() == 'message':
-                        pass
+                        """
+                        Message Command
+                        Message your friends directly by using message feature of Twitter
+
+                        inputs:
+                            content     -> string at most with 256 characters
+                            receiver    -> username of any user of this platform
+                            tweet_id    -> id of tweet you want to forward for your friend(optional)
+                        """
+                        
+                        if len(args) != 3:
+
+                            args = list()
+                            args.append(input('content > '))
+                            args.append(input('receiver > '))
+                            tweet_id = input('tweet_id > ')
+                            args.append(tweet_id if tweet_id else None)
+
+                        functions.SendMessage(logger, cursor, *args)
+
                     elif com.lower() == 'messageinbox':
-                        pass
+                        """
+                        MessageInbox command
+                        You can find out which users have already send a message for you.
+
+                        without any inputs
+                        """
+
+                        data = functions.MessageSenderToMe(logger, cursor)
+                        if data:
+                            inbox_table = PrettyTable()
+                            inbox_table.field_names = ['Inbox']
+                            inbox_table.add_rows(data)
+                            print(inbox_table)
+                        else:
+                            print(f'Your inbox is empty :(')
+
                     elif com.lower() == 'messagesfrom':
-                        pass
+                        """
+                        MessagesFrom command
+                        This command let you to see sent message from specific user to you
+
+                        inputs:
+                            username    -> string at most with 20 characters
+                        """
+                        
+                        if len(args) != 1:
+
+                            args = list()
+                            args.append(input('username > '))
+
+                        data = functions.MessagesToMe(logger, cursor, *args)
+                        if data:
+                            message_table = PrettyTable()
+                            message_table.field_names = ['Message ID', 'Content', 'Sent Time', 'Sender', 'Receiver', 'Forwarded Tweet ID']
+                            message_table.add_rows(data)
+                            print(message_table)
+                        else:
+                            print(f'There is no message for you from user <{args[0]}>')
+
                     elif com.lower() in ('help', 'h'):
-                        pass
+                        """
+                        Help command
+                        This command print this text.
+                        """
+                        with open('help.txt', 'r') as f:
+                            text = f.read()
+                            print(text)
 
                     connection.commit()
     except Error as e:
