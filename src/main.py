@@ -257,32 +257,217 @@ if __name__ == '__main__':
                         functions.RemoveBan(logger, cursor, *args)
 
                     elif com.lower() == 'tweet':
-                        pass
+                        """
+                        Tweet command
+                        You can use this command to send your own tweet to show to the World that you are so creative
+                        and so cool. just you need write your text after this command
+
+                        inputs:
+                            content     -> string content at most with 256 characters
+                        """
+                        
+                        if len(args) != 1:
+
+                            args = list()
+                            args.append(input('content > '))
+
+                        functions.SendTweet(logger, cursor, *args)
+
                     elif com.lower() == 'liketweet':
-                        pass
+                        """
+                        LikeTweet command
+                        You can like tweets which you think are beautiful, creative and innovative.
+
+                        inputs: 
+                            tweet_id    -> id of tweet you are interested to like it which is a integer number
+                        """
+
+                        if len(args) != 1:
+
+                            args = list()
+                            args.append(input('tweet_id > '))
+
+                        functions.LikeTweet(logger, cursor, *args)
+
                     elif com.lower() == 'tweetlikesnum':
-                        pass
+                        """
+                        TweetLikesNum command
+                        Find out how many users like a tweet. likes number can be an indicator for users interest
+
+                        inputs:
+                            tweet_id    -> id of tweet you are interested to see its like number
+                        """
+
+                        if len(args) != 1:
+
+                            args = list()
+                            args.append(input('tweet_id > '))
+
+                        data = functions.TweetLikesNumber(logger, cursor, *args)
+                        print(f'{data} users like this post until now.')
+
                     elif com.lower() == 'likers':
-                        pass
+                        """
+                        Likers
+                        You can see users who like a special tweet, actually users who they didn`t ban you.
+
+                        inputs:
+                            tweet_id    -> id of tweet which you like to see users who like it
+                        """
+                        
+                        if len(args) != 1:
+
+                            args = list()
+                            args.append(input('tweet_id > '))
+
+                        data = functions.UsersLikeTweet(logger, cursor, *args)
+                        if data:
+                            likers_table = PrettyTable()
+                            likers_table.field_names = [f'Users who liked tweet <{args[0]}>']
+                            likers_table.add_rows(data)
+                            print(likers_table)
+                        else:
+                            print('No one liked this tweet :(')
+
                     elif com.lower() == 'comment':
-                        pass
+                        """
+                        Comment Command
+                        You can use this comment to show your comment about a tweet and share your opinion with other people
+
+                        inputs:
+                            content     -> string at most with 256 characters
+                            tweet_id    -> id of tweet which you want add a comment to it
+                        """
+                        
+                        if len(args) != 2:
+
+                            args = list()
+                            args.append(input('content > '))
+                            args.append(input('tweet_id > '))
+
+                        functions.SendComment(logger, cursor, *args)
+
                     elif com.lower() == 'commentsof':
-                        pass
+                        """
+                        CommentsOf command
+                        This command return comments which replied to a specific tweet
+
+                        inputs:
+                            tweet_id    -> id of tweet that you want see its comments.
+                        """
+                        
+                        if len(args) != 1:
+                            
+                            args = list()
+                            args.append(input('tweet_id > '))
+
+                        data = functions.CommentOf(logger, cursor, *args)
+                        if data:
+                            comments_table = PrettyTable()
+                            comments_table.field_names = ['Comment ID', 'Content', 'Sent Date', 'Sender', 'Replied to']
+                            comments_table.add_rows(data)
+                            print(comments_table)
+                        else:
+                            print(f'tweet <{args[0]}> does not have any comment')
+
                     elif com.lower() == 'tweetsof':
-                        pass
+                        """
+                        TweetsOf command
+                        Find out Tweets of every user which is in twitter platform.
+
+                        inputs:
+                            username    -> string at most with 20 character
+                        """
+                        
+                        if len(args) != 1:
+
+                            args = list()
+                            args.append(input('username > '))
+
+                        data = functions.TweetsOf(logger, cursor, *args)
+                        if data:
+                            tweets_table = PrettyTable()
+                            tweets_table.field_names = ['Tweet ID', 'Content', 'Sent Date', 'Sender', 'Replied to']
+                            tweets_table.add_rows(data)
+                            print(tweets_table)
+                        else:
+                            print(f'user <{args[0]}> does not have any tweet')
+
                     elif com.lower() == 'hashtagtweets':
-                        pass
+                        """
+                        HashtagTweets command
+                        You can find every tweets with specific hashtag.
+
+                        inputs:
+                            hashtag     -> string with exactly 6 character which starts with #
+                        """
+                        
+                        if len(args) != 1:
+
+                            args = list()
+                            args.append(input('hashtag > '))
+
+                        data = functions.TweetsWithHashtag(logger, cursor, *args)
+                        if data:
+                            hashtag_table = PrettyTable()
+                            hashtag_table.field_names = ['Tweet ID', 'Content', 'Sent Date', 'Sender', 'Replied to', 'Tweet ID(duplicate)', 'Hashtag']
+                            hashtag_table.add_rows(data)
+                            print(hashtag_table)
+                        else:
+                            print(f'There is no tweet with <{args[0]}> hashtag.')
+
                     elif com.lower() == 'populartweets':
-                        pass
-                    elif com.lower() == 'followingstweets':
-                        pass
-                    elif com.lower() == 'mytweet':
-                        pass
+                        """
+                        PopularTweets command
+                        You can find hot tweets which are so popular and reacted to them.
+
+                        without any input
+                        """
+
+                        data = functions.PopularTweets(logger, cursor)
+                        if data:
+                            pop_table = PrettyTable()
+                            pop_table.field_names = ['Tweet ID', 'Content', 'Sent Date', 'Sender', 'Replied to', 'Likes Number']
+                            pop_table.add_rows(data)
+                            print(pop_table)
+                        else:
+                            print(f'There is no popular tweet :(')
+
+                    elif com.lower() == 'followingtweets':
+                        """
+                        FollowingTweets command
+                        You can check current activities of your following easier than what you can imagine
+
+                        without any input
+                        """
+
+                        data = functions.FollowingTweets(logger, cursor)
+                        if data:
+                            followings_table = PrettyTable()
+                            followings_table.field_names = ['Tweet ID', 'Content', 'Sent Date', 'Sender', 'Replied to']
+                            followings_table.add_rows(data)
+                            print(followings_table)
+                        else:
+                            print(f'There is no tweet from your followings.')
+
+                    elif com.lower() == 'mytweets':
+
+                        data = functions.MyTweets(logger, cursor)
+                        if data:
+                            my_table = PrettyTable()
+                            my_table.field_names = ['Tweet ID', 'Content', 'Sent Date', 'Sender', 'Replied to']
+                            my_table.add_rows(data)
+                            print(my_table)
+                        else:
+                            print(f'there is no tweet from you :(')
+
                     elif com.lower() == 'message':
                         pass
                     elif com.lower() == 'messageinbox':
                         pass
                     elif com.lower() == 'messagesfrom':
+                        pass
+                    elif com.lower() in ('help', 'h'):
                         pass
 
                     connection.commit()
