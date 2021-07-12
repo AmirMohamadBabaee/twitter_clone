@@ -65,11 +65,13 @@ def SendTweet(logger, cursor, content : str):
             logger.exception('[SendTweet] there is an unhandled problem in sending tweet.')
 
 
-def SendMessage(logger, cursor, content : str, receiver : str, tweet_id : int):
+def SendMessage(logger, cursor, content : str, receiver : str, tweet_id=None):
 
     try: 
 
         current_user = get_current_user(logger, cursor)
+        if tweet_id:
+            tweet_id = int(tweet_id)
         cursor.callproc('SendMessage', args=(content, receiver, tweet_id))
         logger.warning(f'[SendMessage] {cursor.fetchwarnings()}')
         logger.info(f'[SendMessage] Message successfully was sent from <{current_user}> to <{receiver}>')
@@ -318,7 +320,7 @@ def MessageSenderToMe(logger, cursor):
         for res in cursor.stored_results():
             data = res.fetchall()
             logger.info(f'[MessageSenderToMe] Message Senders to user <{current_user}> successfully retrieved.')
-            data = list(map(lambda x : x[0], data))
+            # data = list(map(lambda x : x[0], data))
             return data
 
     except Error as e:
