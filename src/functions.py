@@ -339,7 +339,7 @@ def UsersLikeTweet(logger, cursor, tweet_id : int):
         for res in cursor.stored_results():
             data = res.fetchall()
             logger.info(f'[UsersLikeTweet] Users who liked tweet <{tweet_id}> successfully retrieved.')
-            data = list(map(lambda x : x[0], data))
+            # data = list(map(lambda x : x[0], data))
             return data
 
     except Error as e:
